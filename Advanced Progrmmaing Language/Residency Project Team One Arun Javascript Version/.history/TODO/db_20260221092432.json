@@ -1,0 +1,158 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Arun",
+      "email": "arun@ucumberlands.edu",
+      "color": "#667eea"
+    },
+    {
+      "id": 2,
+      "name": "Tarak",
+      "email": "tarak@ucumberlands.edu",
+      "color": "#764ba2"
+    },
+    {
+      "id": 3,
+      "name": "Admin",
+      "email": "admin@ucumberlands.edu",
+      "color": "#28a745"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Work",
+      "color": "#667eea"
+    },
+    {
+      "id": 2,
+      "name": "Personal",
+      "color": "#ffc107"
+    },
+    {
+      "id": 3,
+      "name": "Education",
+      "color": "#28a745"
+    },
+    {
+      "id": 4,
+      "name": "Project",
+      "color": "#e83e8c"
+    }
+  ],
+  "todos": [
+    {
+      "id": 1,
+      "text": "Learn JavaScript Fundamentals",
+      "completed": false,
+      "createdBy": 1,
+      "assignedTo": 1,
+      "categoryId": 3,
+      "dueDate": "2026-02-28",
+      "priority": "high",
+      "version": 1,
+      "lastModifiedBy": 1,
+      "lastModifiedAt": "2026-02-20T10:00:00Z",
+      "createdAt": "2026-02-20T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "text": "Build a TODO App with JSON Server",
+      "completed": true,
+      "createdBy": 1,
+      "assignedTo": 1,
+      "categoryId": 4,
+      "dueDate": "2026-02-20",
+      "priority": "high",
+      "version": 2,
+      "lastModifiedBy": 1,
+      "lastModifiedAt": "2026-02-20T12:00:00Z",
+      "createdAt": "2026-02-20T10:30:00Z"
+    },
+    {
+      "id": 3,
+      "text": "Master Bootstrap & Tailwind CSS",
+      "completed": true,
+      "createdBy": 2,
+      "assignedTo": 2,
+      "categoryId": 3,
+      "dueDate": "2026-02-25",
+      "priority": "medium",
+      "version": 1,
+      "lastModifiedBy": 2,
+      "lastModifiedAt": "2026-02-20T11:00:00Z",
+      "createdAt": "2026-02-20T11:00:00Z"
+    },
+    {
+      "id": 4,
+      "text": "Implement RESTful API Architecture By",
+      "completed": false,
+      "createdBy": 2,
+      "assignedTo": 1,
+      "categoryId": 4,
+      "dueDate": "2026-03-05",
+      "priority": "high",
+      "version": 5,
+      "lastModifiedBy": 1,
+      "lastModifiedAt": "2026-02-21T13:48:14.248Z",
+      "createdAt": "2026-02-20T09:30:00Z"
+    },
+    {
+      "id": 5,
+      "text": "Deploy Application to Cloud",
+      "completed": false,
+      "createdBy": 3,
+      "assignedTo": 2,
+      "categoryId": 1,
+      "dueDate": "2026-03-15",
+      "priority": "medium",
+      "version": 1,
+      "lastModifiedBy": 3,
+      "lastModifiedAt": "2026-02-20T14:00:00Z",
+      "createdAt": "2026-02-20T14:00:00Z"
+    },
+    {
+      "text": "New Task for Tarak",
+      "completed": false,
+      "createdBy": 1,
+      "assignedTo": 2,
+      "categoryId": 1,
+      "dueDate": null,
+      "priority": "medium",
+      "version": 1,
+      "lastModifiedBy": 1,
+      "lastModifiedAt": "2026-02-21T13:45:18.358Z",
+      "createdAt": "2026-02-21T13:45:18.358Z",
+      "id": 8
+    },
+    {
+      "text": "Finish residency project",
+      "completed": false,
+      "createdBy": 1,
+      "assignedTo": 1,
+      "categoryId": 1,
+      "dueDate": null,
+      "priority": "medium",
+      "version": 1,
+      "lastModifiedBy": 1,
+      "lastModifiedAt": "2026-02-21T13:45:54.799Z",
+      "createdAt": "2026-02-21T13:45:54.799Z",
+      "id": 9
+    },
+    {
+      "text": "This is another Test Task",
+      "completed": false,
+      "createdBy": 1,
+      "assignedTo": 1,
+      "categoryId": 1,
+      "dueDate": null,
+      "priority": "low",
+      "version": 1,
+      "lastModifiedBy": 1,
+      "lastModifiedAt": "2026-02-21T14:23:22.202Z",
+      "createdAt": "2026-02-21T14:23:22.202Z",
+      "id": 10
+    }
+  ]
+}
