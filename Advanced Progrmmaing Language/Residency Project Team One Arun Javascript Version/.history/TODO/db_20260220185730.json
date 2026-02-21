@@ -1,0 +1,106 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Arun",
+      "email": "arun@example.com",
+      "color": "#667eea"
+    },
+    {
+      "id": 2,
+      "name": "Tarak",
+      "email": "tarak@example.com",
+      "color": "#764ba2"
+    },
+    {
+      "id": 3,
+      "name": "Admin",
+      "email": "admin@example.com",
+      "color": "#28a745"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Work",
+      "color": "#667eea"
+    },
+    {
+      "id": 2,
+      "name": "Personal",
+      "color": "#ffc107"
+    },
+    {
+      "id": 3,
+      "name": "Education",
+      "color": "#28a745"
+    },
+    {
+      "id": 4,
+      "name": "Project",
+      "color": "#e83e8c"
+    }
+  ],
+  "todos": [
+    {
+      "id": 1,
+      "text": "Learn JavaScript Fundamentals",
+      "completed": false,
+      "createdBy": 1,
+      "assignedTo": 1,
+      "categoryId": 3,
+      "dueDate": "2026-02-28",
+      "priority": "high"
+    },
+    {
+      "id": 2,
+      "text": "Build a TODO App with JSON Server",
+      "completed": true,
+      "createdBy": 1,
+      "assignedTo": 1,
+      "categoryId": 4,
+      "dueDate": "2026-02-20",
+      "priority": "high"
+    },
+    {
+      "id": 3,
+      "text": "Master Bootstrap & Tailwind CSS",
+      "completed": true,
+      "createdBy": 2,
+      "assignedTo": 2,
+      "categoryId": 3,
+      "dueDate": "2026-02-25",
+      "priority": "medium"
+    },
+    {
+      "id": 4,
+      "text": "Implement RESTful API Architecture",
+      "completed": false,
+      "createdBy": 2,
+      "assignedTo": 1,
+      "categoryId": 4,
+      "dueDate": "2026-03-05",
+      "priority": "high"
+    },
+    {
+      "id": 5,
+      "text": "Deploy Application to Cloud",
+      "completed": false,
+      "createdBy": 3,
+      "assignedTo": 2,
+      "categoryId": 1,
+      "dueDate": "2026-03-15",
+      "priority": "medium"
+    },
+    {
+      "id": 6,
+      "text": "Finish residency assignment with Tarak",
+      "completed": false,
+      "createdBy": 1,
+      "assignedTo": 1,
+      "categoryId": 4,
+      "dueDate": "2026-02-28",
+      "priority": "high"
+    }
+  ]
+}
