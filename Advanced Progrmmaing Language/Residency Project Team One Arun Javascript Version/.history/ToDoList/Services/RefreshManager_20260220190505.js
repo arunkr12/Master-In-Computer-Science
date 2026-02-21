@@ -3,7 +3,7 @@
  * Detects when other users modify tasks and notifies UI
  */
 class RefreshManager {
-  constructor(todoService, intervalMs) {
+  constructor(todoService, intervalMs = 5000) {
     this.todoService = todoService;
     this.intervalMs = intervalMs;
     this.refreshIntervalId = null;

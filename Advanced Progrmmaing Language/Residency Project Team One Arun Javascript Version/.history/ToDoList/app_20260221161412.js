@@ -167,14 +167,8 @@ function bindAddTodoControls() {
         refreshBody();
         // Restore focus to input field for next entry
         setTimeout(() => {
-          const newInputField = /** @type {HTMLElement | null} */ (
-            document.querySelector(".add-todo-input")
-          );
-          if (newInputField instanceof HTMLInputElement) {
-            newInputField.focus();
-          } else {
-            todoContainer.setAddInputFocusState(false);
-          }
+          const newInputField = document.querySelector(".add-todo-input");
+          if (newInputField) newInputField.focus();
         }, 0);
       }
     });
@@ -202,14 +196,8 @@ function bindAddTodoControls() {
           refreshBody();
           // Restore focus to input field for next entry
           setTimeout(() => {
-            const newInputField = /** @type {HTMLElement | null} */ (
-              document.querySelector(".add-todo-input")
-            );
-            if (newInputField instanceof HTMLInputElement) {
-              newInputField.focus();
-            } else {
-              todoContainer.setAddInputFocusState(false);
-            }
+            const newInputField = document.querySelector(".add-todo-input");
+            if (newInputField) newInputField.focus();
           }, 0);
         }
       }

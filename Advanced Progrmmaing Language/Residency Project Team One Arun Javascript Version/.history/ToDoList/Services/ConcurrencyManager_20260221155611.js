@@ -34,7 +34,7 @@ class ConcurrencyManager {
 
   /**
    * Perform optimistic update with version checking
-   * @returns {Promise<Object>} {success: boolean, conflict: boolean, message: string}
+    * @returns {Promise<Object>} {success: boolean, conflict: boolean, message: string}
    */
   async validateUpdate(todoId, cachedVersion, serverTodo) {
     // Check if version matches

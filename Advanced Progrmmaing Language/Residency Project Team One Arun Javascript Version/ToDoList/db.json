@@ -43,34 +43,6 @@
   ],
   "todos": [
     {
-      "id": 1,
-      "text": "Learn JavaScript Fundamentals",
-      "completed": false,
-      "createdBy": 1,
-      "assignedTo": 1,
-      "categoryId": 3,
-      "dueDate": "2026-02-28",
-      "priority": "high",
-      "version": 3,
-      "lastModifiedBy": 1,
-      "lastModifiedAt": "2026-02-21T16:44:57.088Z",
-      "createdAt": "2026-02-20T10:00:00Z"
-    },
-    {
-      "id": 2,
-      "text": "Build a TODO App with JSON Server",
-      "completed": true,
-      "createdBy": 1,
-      "assignedTo": 1,
-      "categoryId": 4,
-      "dueDate": "2026-02-20",
-      "priority": "high",
-      "version": 2,
-      "lastModifiedBy": 1,
-      "lastModifiedAt": "2026-02-20T12:00:00Z",
-      "createdAt": "2026-02-20T10:30:00Z"
-    },
-    {
       "id": 3,
       "text": "Master Bootstrap & Tailwind CSS",
       "completed": true,
@@ -113,32 +85,60 @@
       "id": 8
     },
     {
-      "text": "This is test todo 3",
-      "completed": true,
+      "text": "Finish Design Document for Residency Project",
+      "completed": false,
+      "createdBy": 1,
+      "assignedTo": 1,
+      "categoryId": 4,
+      "dueDate": null,
+      "priority": "high",
+      "version": 1,
+      "lastModifiedBy": 1,
+      "lastModifiedAt": "2026-02-21T21:07:01.080Z",
+      "createdAt": "2026-02-21T21:07:01.080Z",
+      "id": 9
+    },
+    {
+      "text": "Build Running app for ToDoList",
+      "completed": false,
+      "createdBy": 1,
+      "assignedTo": 1,
+      "categoryId": 4,
+      "dueDate": null,
+      "priority": "medium",
+      "version": 1,
+      "lastModifiedBy": 1,
+      "lastModifiedAt": "2026-02-21T21:07:31.776Z",
+      "createdAt": "2026-02-21T21:07:31.776Z",
+      "id": 10
+    },
+    {
+      "text": "Finish Presentation and Report",
+      "completed": false,
+      "createdBy": 1,
+      "assignedTo": 1,
+      "categoryId": 4,
+      "dueDate": null,
+      "priority": "medium",
+      "version": 1,
+      "lastModifiedBy": 1,
+      "lastModifiedAt": "2026-02-21T21:07:51.129Z",
+      "createdAt": "2026-02-21T21:07:51.129Z",
+      "id": 11
+    },
+    {
+      "text": "Learn Rust lang",
+      "completed": false,
       "createdBy": 1,
       "assignedTo": 1,
       "categoryId": 1,
       "dueDate": null,
       "priority": "medium",
-      "version": 5,
+      "version": 1,
       "lastModifiedBy": 1,
-      "lastModifiedAt": "2026-02-21T17:20:54.337Z",
-      "createdAt": "2026-02-21T16:32:15.528Z",
-      "id": 9
-    },
-    {
-      "text": "This is another Todo",
-      "completed": false,
-      "createdBy": 1,
-      "assignedTo": 1,
-      "categoryId": 2,
-      "dueDate": null,
-      "priority": "medium",
-      "version": 8,
-      "lastModifiedBy": 1,
-      "lastModifiedAt": "2026-02-21T17:22:03.939Z",
-      "createdAt": "2026-02-21T16:32:28.585Z",
-      "id": 10
+      "lastModifiedAt": "2026-02-21T21:18:25.210Z",
+      "createdAt": "2026-02-21T21:18:25.210Z",
+      "id": 12
     }
   ]
 }

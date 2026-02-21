@@ -13,12 +13,7 @@ class AddTodo {
     this.categories = categories;
   }
 
-  setInputValue(value) {
-    this.inputValue = value || "";
-  }
-
   render() {
-    const safeInputValue = (this.inputValue || "").replace(/"/g, "&quot;");
     return `
       <div class="card shadow-lg border-0" style="border-radius: 8px;">
         <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 8px 8px 0 0; padding: 1rem;">
@@ -32,7 +27,6 @@ class AddTodo {
             <input type="text" class="add-todo-input" 
                    placeholder="✍️ What's your next task?" 
                    id="newTaskInput"
-                   value="${safeInputValue}"
                    style="width: 100%; border: 2px solid #f5576c; border-radius: 6px; padding: 8px; font-size: 0.9rem; box-sizing: border-box;">
           </div>
 

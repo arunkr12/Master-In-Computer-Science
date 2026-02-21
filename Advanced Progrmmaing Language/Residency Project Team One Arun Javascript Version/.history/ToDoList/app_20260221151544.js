@@ -1,10 +1,8 @@
 import ToDoContainer from "./ToDoContainer/ToDoContainer.js";
-import ConflictResolver from "./Services/ConflictResolver.js";
 
 // Initialize the app
 const app = document.getElementById("app");
 const todoContainer = new ToDoContainer();
-const conflictResolver = new ConflictResolver();
 /** @type {any} */ (window).todoContainer = todoContainer;
 
 // Load todos from JSON Server and render the app
@@ -122,29 +120,6 @@ function bindAddTodoControls() {
   );
 
   if (addBtn && inputField) {
-    // keep input value in sync so refreshes don't wipe user text
-    inputField.value = todoContainer.getPendingAddText();
-    inputField.addEventListener("input", () => {
-      todoContainer.setPendingAddText(inputField.value);
-    });
-
-    // Remember focus state so we can restore it after refreshes
-    inputField.addEventListener("focus", () => {
-      todoContainer.setAddInputFocusState(true);
-    });
-
-    inputField.addEventListener("blur", () => {
-      todoContainer.setAddInputFocusState(false);
-    });
-
-    if (todoContainer.isAddInputFocusedNow()) {
-      setTimeout(() => {
-        if (document.activeElement !== inputField) {
-          inputField.focus();
-        }
-      }, 0);
-    }
-
     // UI listener: Add Task button click
     addBtn.addEventListener("click", async () => {
       const text = inputField.value;
@@ -161,21 +136,7 @@ function bindAddTodoControls() {
           categoryId: categoryId,
           priority: priority,
         });
-        todoContainer.setPendingAddText("");
-        inputField.value = ""; // Clear input after successful add
-        todoContainer.setAddInputFocusState(true);
         refreshBody();
-        // Restore focus to input field for next entry
-        setTimeout(() => {
-          const newInputField = /** @type {HTMLElement | null} */ (
-            document.querySelector(".add-todo-input")
-          );
-          if (newInputField instanceof HTMLInputElement) {
-            newInputField.focus();
-          } else {
-            todoContainer.setAddInputFocusState(false);
-          }
-        }, 0);
       }
     });
 
@@ -196,21 +157,7 @@ function bindAddTodoControls() {
             categoryId: categoryId,
             priority: priority,
           });
-          todoContainer.setPendingAddText("");
-          inputField.value = ""; // Clear input after successful add
-          todoContainer.setAddInputFocusState(true);
           refreshBody();
-          // Restore focus to input field for next entry
-          setTimeout(() => {
-            const newInputField = /** @type {HTMLElement | null} */ (
-              document.querySelector(".add-todo-input")
-            );
-            if (newInputField instanceof HTMLInputElement) {
-              newInputField.focus();
-            } else {
-              todoContainer.setAddInputFocusState(false);
-            }
-          }, 0);
         }
       }
     });
@@ -284,36 +231,7 @@ function bindEditButtons() {
       const saveHandler = async () => {
         const newText = input.value;
         if (newText !== null && newText.trim()) {
-          const result = await todoContainer.editTodoItem(id, newText.trim());
-
-          if (result && result.conflict) {
-            const shouldOverride = await conflictResolver.showConflictDialog(
-              "This task was changed by another user. Override their change with your version?",
-            );
-
-            if (shouldOverride) {
-              const overrideResult = await todoContainer.forceEditTodoItem(
-                id,
-                newText.trim(),
-              );
-              if (overrideResult.success) {
-                showUiAlert("Conflict overridden and task saved.", "warning");
-              } else {
-                showUiAlert(
-                  "Unable to override. Latest server version loaded.",
-                  "danger",
-                );
-                await todoContainer.refreshLocalTodos();
-              }
-            } else {
-              await todoContainer.refreshLocalTodos();
-              showUiAlert(
-                "Edit cancelled. Latest server version loaded.",
-                "info",
-              );
-            }
-          }
-
+          await todoContainer.editTodoItem(id, newText.trim());
           resumeAutoRefresh();
           refreshBody();
         }

@@ -122,29 +122,6 @@ function bindAddTodoControls() {
   );
 
   if (addBtn && inputField) {
-    // keep input value in sync so refreshes don't wipe user text
-    inputField.value = todoContainer.getPendingAddText();
-    inputField.addEventListener("input", () => {
-      todoContainer.setPendingAddText(inputField.value);
-    });
-
-    // Remember focus state so we can restore it after refreshes
-    inputField.addEventListener("focus", () => {
-      todoContainer.setAddInputFocusState(true);
-    });
-
-    inputField.addEventListener("blur", () => {
-      todoContainer.setAddInputFocusState(false);
-    });
-
-    if (todoContainer.isAddInputFocusedNow()) {
-      setTimeout(() => {
-        if (document.activeElement !== inputField) {
-          inputField.focus();
-        }
-      }, 0);
-    }
-
     // UI listener: Add Task button click
     addBtn.addEventListener("click", async () => {
       const text = inputField.value;
@@ -161,20 +138,12 @@ function bindAddTodoControls() {
           categoryId: categoryId,
           priority: priority,
         });
-        todoContainer.setPendingAddText("");
         inputField.value = ""; // Clear input after successful add
-        todoContainer.setAddInputFocusState(true);
         refreshBody();
         // Restore focus to input field for next entry
         setTimeout(() => {
-          const newInputField = /** @type {HTMLElement | null} */ (
-            document.querySelector(".add-todo-input")
-          );
-          if (newInputField instanceof HTMLInputElement) {
-            newInputField.focus();
-          } else {
-            todoContainer.setAddInputFocusState(false);
-          }
+          const newInputField = document.querySelector(".add-todo-input");
+          if (newInputField) newInputField.focus();
         }, 0);
       }
     });
@@ -196,20 +165,12 @@ function bindAddTodoControls() {
             categoryId: categoryId,
             priority: priority,
           });
-          todoContainer.setPendingAddText("");
           inputField.value = ""; // Clear input after successful add
-          todoContainer.setAddInputFocusState(true);
           refreshBody();
           // Restore focus to input field for next entry
           setTimeout(() => {
-            const newInputField = /** @type {HTMLElement | null} */ (
-              document.querySelector(".add-todo-input")
-            );
-            if (newInputField instanceof HTMLInputElement) {
-              newInputField.focus();
-            } else {
-              todoContainer.setAddInputFocusState(false);
-            }
+            const newInputField = document.querySelector(".add-todo-input");
+            if (newInputField) newInputField.focus();
           }, 0);
         }
       }

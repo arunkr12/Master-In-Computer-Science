@@ -159,16 +159,9 @@ class TodoService {
    * @param {Object} updates - Fields to update (e.g., {text: "...", completed: true})
    * @param {number} userId - ID of the user making the update
    * @param {number} [expectedVersion] - Local cached version expected by client
-   * @param {{force?: boolean}} [options] - Pass {force:true} to override conflict checks
    * @returns {Promise<Object>} {success, todo, conflict} - conflict=true if version mismatch detected
    */
-  async updateTodo(
-    id,
-    updates,
-    userId,
-    expectedVersion = undefined,
-    options = {},
-  ) {
+  async updateTodo(id, updates, userId, expectedVersion = undefined) {
     try {
       // Check current server version first (optimistic locking)
       const serverTodo = await this.getTodoById(id);
@@ -176,7 +169,6 @@ class TodoService {
 
       // Detect conflict if client is editing a stale version
       if (
-        !options.force &&
         expectedVersion !== undefined &&
         expectedVersion !== null &&
         serverTodo.version !== expectedVersion

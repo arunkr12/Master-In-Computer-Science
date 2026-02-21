@@ -22,7 +22,7 @@ class ToDoContainer {
 
     // Concurrency management
     this.concurrencyManager = new ConcurrencyManager();
-    this.refreshManager = new RefreshManager(this.todoService, 60000); // Refresh every 60 seconds
+    this.refreshManager = new RefreshManager(this.todoService, 5000); // Refresh every 5 seconds
 
     this.todos = [];
     this.users = [];
@@ -31,9 +31,6 @@ class ToDoContainer {
     this.selectedCategoryId = null;
     this.remoteUpdateNotifications = [];
     this.changeListeners = [];
-    this.notificationListeners = [];
-    this.pendingAddText = "";
-    this.isAddInputFocused = false;
   }
 
   onChange(callback) {
@@ -48,22 +45,6 @@ class ToDoContainer {
         listener();
       } catch (error) {
         console.error("Error in change listener:", error);
-      }
-    });
-  }
-
-  onNotification(callback) {
-    if (typeof callback === "function") {
-      this.notificationListeners.push(callback);
-    }
-  }
-
-  notifyNotification(notification) {
-    this.notificationListeners.forEach((listener) => {
-      try {
-        listener(notification);
-      } catch (error) {
-        console.error("Error in notification listener:", error);
       }
     });
   }
@@ -91,12 +72,6 @@ class ToDoContainer {
     this.concurrencyManager.onConflict((conflictInfo) => {
       console.warn("⚠️ Conflict detected:", conflictInfo);
       this.remoteUpdateNotifications.push(conflictInfo);
-      this.notifyNotification({
-        type: "warning",
-        message:
-          conflictInfo.message ||
-          "Conflict detected. Another user modified this task.",
-      });
     });
 
     // Set up refresh listeners for auto-sync
@@ -176,28 +151,6 @@ class ToDoContainer {
 
     this.addTodo.setUsers(this.users);
     this.addTodo.setCategories(this.categories);
-    if (typeof this.addTodo.setInputValue === "function") {
-      this.addTodo.setInputValue(this.pendingAddText);
-    }
-  }
-
-  setPendingAddText(value) {
-    this.pendingAddText = value || "";
-    if (typeof this.addTodo.setInputValue === "function") {
-      this.addTodo.setInputValue(this.pendingAddText);
-    }
-  }
-
-  getPendingAddText() {
-    return this.pendingAddText;
-  }
-
-  setAddInputFocusState(isFocused) {
-    this.isAddInputFocused = !!isFocused;
-  }
-
-  isAddInputFocusedNow() {
-    return this.isAddInputFocused;
   }
 
   async addTodoItem(todoData) {
@@ -213,7 +166,6 @@ class ToDoContainer {
       if (newTodo) {
         this.todos.push(newTodo);
         this.updateComponents();
-        this.setPendingAddText("");
         return newTodo;
       }
     }
@@ -237,6 +189,13 @@ class ToDoContainer {
       if (result.success) {
         // Update cache and local state
         this.concurrencyManager.cacheVersion(id, result.todo.version);
+        this.concurrencyManager.logChange(
+          id,
+          "UPDATE",
+          this.currentUserId,
+          null,
+          result.todo,
+        );
 
         const todo = this.todos.find((t) => t.id === id);
         if (todo) {
@@ -246,11 +205,7 @@ class ToDoContainer {
           todo.lastModifiedBy = result.todo.lastModifiedBy;
           this.updateComponents();
         }
-        return {
-          success: true,
-          conflict: false,
-          todo: result.todo,
-        };
+        return result.todo;
       } else if (result.conflict) {
         // Handle version conflict
         const conflictInfo = {
@@ -258,64 +213,15 @@ class ToDoContainer {
           todo: result.serverTodo,
           suggestRefresh: true,
         };
-        return {
-          success: false,
-          conflict: true,
-          conflictInfo: conflictInfo,
-          serverTodo: result.serverTodo,
-          pendingText: newText.trim(),
-        };
+        this.concurrencyManager.notifyConflict(conflictInfo);
+        alert(
+          `⚠️ Conflict: This task was recently modified. Please refresh to see the latest version.`,
+        );
+        await this.refreshLocalTodos();
+        return null;
       }
     }
-    return {
-      success: false,
-      conflict: false,
-      todo: null,
-    };
-  }
-
-  async forceEditTodoItem(id, newText) {
-    if (!newText || !newText.trim()) {
-      return {
-        success: false,
-        conflict: false,
-        todo: null,
-      };
-    }
-
-    const result = await this.todoService.updateTodo(
-      id,
-      {
-        text: newText.trim(),
-      },
-      this.currentUserId,
-      undefined,
-      { force: true },
-    );
-
-    if (result.success) {
-      this.concurrencyManager.cacheVersion(id, result.todo.version);
-
-      const todo = this.todos.find((t) => t.id === id);
-      if (todo) {
-        todo.text = newText.trim();
-        todo.version = result.todo.version;
-        todo.lastModifiedAt = result.todo.lastModifiedAt;
-        todo.lastModifiedBy = result.todo.lastModifiedBy;
-      }
-      this.updateComponents();
-      return {
-        success: true,
-        conflict: false,
-        todo: result.todo,
-      };
-    }
-
-    return {
-      success: false,
-      conflict: !!result.conflict,
-      todo: null,
-    };
+    return null;
   }
 
   async toggleTodoItem(id) {
@@ -336,6 +242,13 @@ class ToDoContainer {
       if (result.success) {
         // Update cache and local state
         this.concurrencyManager.cacheVersion(id, result.todo.version);
+        this.concurrencyManager.logChange(
+          id,
+          "UPDATE",
+          this.currentUserId,
+          { completed: todo.completed },
+          { completed: result.todo.completed },
+        );
 
         todo.completed = result.todo.completed;
         todo.version = result.todo.version;
@@ -351,6 +264,7 @@ class ToDoContainer {
           suggestRefresh: true,
         };
         this.concurrencyManager.notifyConflict(conflictInfo);
+        alert(`⚠️ Conflict: This task was recently modified. Refreshing...`);
         await this.refreshLocalTodos();
         return null;
       }
@@ -365,17 +279,24 @@ class ToDoContainer {
     try {
       const success = await this.todoService.deleteTodo(id);
       if (success) {
+        // Log deletion in audit trail
+        this.concurrencyManager.logChange(
+          id,
+          "DELETE",
+          this.currentUserId,
+          todo,
+          null,
+        );
+
         this.todos = this.todos.filter((t) => t.id !== id);
         this.updateComponents();
         return true;
       }
     } catch (error) {
       console.error("Error deleting todo:", error);
-      this.notifyNotification({
-        type: "danger",
-        message:
-          "Failed to delete task. It may have been modified or deleted by another user.",
-      });
+      alert(
+        `⚠️ Failed to delete task. It may have been modified or deleted by another user.`,
+      );
       await this.refreshLocalTodos();
       return false;
     }
@@ -406,7 +327,6 @@ class ToDoContainer {
                 <div class="container">
             <div class="row mb-4">
               <div class="col-12">
-                <div id="ui-alert-region"></div>
               </div>
             </div>
                     <div class="row mb-4">

@@ -1,10 +1,8 @@
 import ToDoContainer from "./ToDoContainer/ToDoContainer.js";
-import ConflictResolver from "./Services/ConflictResolver.js";
 
 // Initialize the app
 const app = document.getElementById("app");
 const todoContainer = new ToDoContainer();
-const conflictResolver = new ConflictResolver();
 /** @type {any} */ (window).todoContainer = todoContainer;
 
 // Load todos from JSON Server and render the app
@@ -89,6 +87,90 @@ function showUiAlert(message, type = "warning") {
   }, 5000);
 }
 
+function ensureConflictModal() {
+  let modalEl = document.getElementById("conflict-modal");
+  if (modalEl) return modalEl;
+
+  modalEl = document.createElement("div");
+  modalEl.id = "conflict-modal";
+  modalEl.className = "modal fade";
+  modalEl.tabIndex = -1;
+  modalEl.setAttribute("aria-hidden", "true");
+  modalEl.innerHTML = `
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Conflict Detected</h5>
+        </div>
+        <div class="modal-body">
+          <p id="conflict-modal-message" class="mb-0"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-action="cancel">Cancel</button>
+          <button type="button" class="btn btn-danger" data-action="override">Override & Save</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modalEl);
+  return modalEl;
+}
+
+function showConflictDialog(message) {
+  return new Promise((resolve) => {
+    const modalEl = ensureConflictModal();
+    const messageEl = modalEl.querySelector("#conflict-modal-message");
+    const cancelBtn = modalEl.querySelector('[data-action="cancel"]');
+    const overrideBtn = modalEl.querySelector('[data-action="override"]');
+
+    if (messageEl) {
+      messageEl.textContent =
+        message ||
+        "Another user has modified this task. Do you want to override their changes?";
+    }
+
+    const BootstrapModal = /** @type {any} */ (window).bootstrap?.Modal;
+    if (!BootstrapModal) {
+      resolve(false);
+      return;
+    }
+
+    const modal = BootstrapModal.getOrCreateInstance(modalEl, {
+      backdrop: "static",
+      keyboard: false,
+    });
+
+    const cleanup = () => {
+      modalEl.removeEventListener("hidden.bs.modal", onHidden);
+      cancelBtn?.removeEventListener("click", onCancel);
+      overrideBtn?.removeEventListener("click", onOverride);
+    };
+
+    const onCancel = () => {
+      cleanup();
+      modal.hide();
+      resolve(false);
+    };
+
+    const onOverride = () => {
+      cleanup();
+      modal.hide();
+      resolve(true);
+    };
+
+    const onHidden = () => {
+      cleanup();
+      resolve(false);
+    };
+
+    cancelBtn?.addEventListener("click", onCancel, { once: true });
+    overrideBtn?.addEventListener("click", onOverride, { once: true });
+    modalEl.addEventListener("hidden.bs.modal", onHidden, { once: true });
+
+    modal.show();
+  });
+}
+
 function bindUserSelector() {
   // User selector
   const userSelector = document.querySelector(".user-selector");
@@ -122,29 +204,6 @@ function bindAddTodoControls() {
   );
 
   if (addBtn && inputField) {
-    // keep input value in sync so refreshes don't wipe user text
-    inputField.value = todoContainer.getPendingAddText();
-    inputField.addEventListener("input", () => {
-      todoContainer.setPendingAddText(inputField.value);
-    });
-
-    // Remember focus state so we can restore it after refreshes
-    inputField.addEventListener("focus", () => {
-      todoContainer.setAddInputFocusState(true);
-    });
-
-    inputField.addEventListener("blur", () => {
-      todoContainer.setAddInputFocusState(false);
-    });
-
-    if (todoContainer.isAddInputFocusedNow()) {
-      setTimeout(() => {
-        if (document.activeElement !== inputField) {
-          inputField.focus();
-        }
-      }, 0);
-    }
-
     // UI listener: Add Task button click
     addBtn.addEventListener("click", async () => {
       const text = inputField.value;
@@ -161,21 +220,7 @@ function bindAddTodoControls() {
           categoryId: categoryId,
           priority: priority,
         });
-        todoContainer.setPendingAddText("");
-        inputField.value = ""; // Clear input after successful add
-        todoContainer.setAddInputFocusState(true);
         refreshBody();
-        // Restore focus to input field for next entry
-        setTimeout(() => {
-          const newInputField = /** @type {HTMLElement | null} */ (
-            document.querySelector(".add-todo-input")
-          );
-          if (newInputField instanceof HTMLInputElement) {
-            newInputField.focus();
-          } else {
-            todoContainer.setAddInputFocusState(false);
-          }
-        }, 0);
       }
     });
 
@@ -196,21 +241,7 @@ function bindAddTodoControls() {
             categoryId: categoryId,
             priority: priority,
           });
-          todoContainer.setPendingAddText("");
-          inputField.value = ""; // Clear input after successful add
-          todoContainer.setAddInputFocusState(true);
           refreshBody();
-          // Restore focus to input field for next entry
-          setTimeout(() => {
-            const newInputField = /** @type {HTMLElement | null} */ (
-              document.querySelector(".add-todo-input")
-            );
-            if (newInputField instanceof HTMLInputElement) {
-              newInputField.focus();
-            } else {
-              todoContainer.setAddInputFocusState(false);
-            }
-          }, 0);
         }
       }
     });
@@ -287,7 +318,7 @@ function bindEditButtons() {
           const result = await todoContainer.editTodoItem(id, newText.trim());
 
           if (result && result.conflict) {
-            const shouldOverride = await conflictResolver.showConflictDialog(
+            const shouldOverride = await showConflictDialog(
               "This task was changed by another user. Override their change with your version?",
             );
 
@@ -299,18 +330,12 @@ function bindEditButtons() {
               if (overrideResult.success) {
                 showUiAlert("Conflict overridden and task saved.", "warning");
               } else {
-                showUiAlert(
-                  "Unable to override. Latest server version loaded.",
-                  "danger",
-                );
+                showUiAlert("Unable to override. Latest server version loaded.", "danger");
                 await todoContainer.refreshLocalTodos();
               }
             } else {
               await todoContainer.refreshLocalTodos();
-              showUiAlert(
-                "Edit cancelled. Latest server version loaded.",
-                "info",
-              );
+              showUiAlert("Edit cancelled. Latest server version loaded.", "info");
             }
           }
 

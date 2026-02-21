@@ -32,8 +32,6 @@ class ToDoContainer {
     this.remoteUpdateNotifications = [];
     this.changeListeners = [];
     this.notificationListeners = [];
-    this.pendingAddText = "";
-    this.isAddInputFocused = false;
   }
 
   onChange(callback) {
@@ -176,28 +174,6 @@ class ToDoContainer {
 
     this.addTodo.setUsers(this.users);
     this.addTodo.setCategories(this.categories);
-    if (typeof this.addTodo.setInputValue === "function") {
-      this.addTodo.setInputValue(this.pendingAddText);
-    }
-  }
-
-  setPendingAddText(value) {
-    this.pendingAddText = value || "";
-    if (typeof this.addTodo.setInputValue === "function") {
-      this.addTodo.setInputValue(this.pendingAddText);
-    }
-  }
-
-  getPendingAddText() {
-    return this.pendingAddText;
-  }
-
-  setAddInputFocusState(isFocused) {
-    this.isAddInputFocused = !!isFocused;
-  }
-
-  isAddInputFocusedNow() {
-    return this.isAddInputFocused;
   }
 
   async addTodoItem(todoData) {
@@ -213,7 +189,6 @@ class ToDoContainer {
       if (newTodo) {
         this.todos.push(newTodo);
         this.updateComponents();
-        this.setPendingAddText("");
         return newTodo;
       }
     }

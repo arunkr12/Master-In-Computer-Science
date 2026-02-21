@@ -32,8 +32,6 @@ class ToDoContainer {
     this.remoteUpdateNotifications = [];
     this.changeListeners = [];
     this.notificationListeners = [];
-    this.pendingAddText = "";
-    this.isAddInputFocused = false;
   }
 
   onChange(callback) {
@@ -176,28 +174,6 @@ class ToDoContainer {
 
     this.addTodo.setUsers(this.users);
     this.addTodo.setCategories(this.categories);
-    if (typeof this.addTodo.setInputValue === "function") {
-      this.addTodo.setInputValue(this.pendingAddText);
-    }
-  }
-
-  setPendingAddText(value) {
-    this.pendingAddText = value || "";
-    if (typeof this.addTodo.setInputValue === "function") {
-      this.addTodo.setInputValue(this.pendingAddText);
-    }
-  }
-
-  getPendingAddText() {
-    return this.pendingAddText;
-  }
-
-  setAddInputFocusState(isFocused) {
-    this.isAddInputFocused = !!isFocused;
-  }
-
-  isAddInputFocusedNow() {
-    return this.isAddInputFocused;
   }
 
   async addTodoItem(todoData) {
@@ -213,7 +189,6 @@ class ToDoContainer {
       if (newTodo) {
         this.todos.push(newTodo);
         this.updateComponents();
-        this.setPendingAddText("");
         return newTodo;
       }
     }
@@ -237,6 +212,13 @@ class ToDoContainer {
       if (result.success) {
         // Update cache and local state
         this.concurrencyManager.cacheVersion(id, result.todo.version);
+        this.concurrencyManager.logChange(
+          id,
+          "UPDATE",
+          this.currentUserId,
+          null,
+          result.todo,
+        );
 
         const todo = this.todos.find((t) => t.id === id);
         if (todo) {
@@ -295,6 +277,13 @@ class ToDoContainer {
 
     if (result.success) {
       this.concurrencyManager.cacheVersion(id, result.todo.version);
+      this.concurrencyManager.logChange(
+        id,
+        "OVERRIDE_UPDATE",
+        this.currentUserId,
+        null,
+        result.todo,
+      );
 
       const todo = this.todos.find((t) => t.id === id);
       if (todo) {
@@ -336,6 +325,13 @@ class ToDoContainer {
       if (result.success) {
         // Update cache and local state
         this.concurrencyManager.cacheVersion(id, result.todo.version);
+        this.concurrencyManager.logChange(
+          id,
+          "UPDATE",
+          this.currentUserId,
+          { completed: todo.completed },
+          { completed: result.todo.completed },
+        );
 
         todo.completed = result.todo.completed;
         todo.version = result.todo.version;
@@ -365,6 +361,15 @@ class ToDoContainer {
     try {
       const success = await this.todoService.deleteTodo(id);
       if (success) {
+        // Log deletion in audit trail
+        this.concurrencyManager.logChange(
+          id,
+          "DELETE",
+          this.currentUserId,
+          todo,
+          null,
+        );
+
         this.todos = this.todos.filter((t) => t.id !== id);
         this.updateComponents();
         return true;
