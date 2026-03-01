@@ -1,0 +1,158 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Arun",
+      "email": "arun@ucumberlands.edu",
+      "color": "#667eea"
+    },
+    {
+      "id": 2,
+      "name": "Tarak",
+      "email": "tarak@ucumberlands.edu",
+      "color": "#764ba2"
+    },
+    {
+      "id": 3,
+      "name": "Admin",
+      "email": "admin@ucumberlands.edu",
+      "color": "#28a745"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Work",
+      "color": "#667eea"
+    },
+    {
+      "id": 2,
+      "name": "Personal",
+      "color": "#ffc107"
+    },
+    {
+      "id": 3,
+      "name": "Education",
+      "color": "#28a745"
+    },
+    {
+      "id": 4,
+      "name": "Project",
+      "color": "#e83e8c"
+    }
+  ],
+  "todos": [
+    {
+      "id": 3,
+      "text": "Master Bootstrap & Tailwind CSS",
+      "completed": true,
+      "createdBy": 2,
+      "assignedTo": 2,
+      "categoryId": 3,
+      "dueDate": "2026-02-25",
+      "priority": "medium",
+      "version": 1,
+      "lastModifiedBy": 2,
+      "lastModifiedAt": "2026-02-20T11:00:00Z",
+      "createdAt": "2026-02-20T11:00:00Z"
+    },
+    {
+      "id": 5,
+      "text": "Deploy Application to Cloud",
+      "completed": false,
+      "createdBy": 3,
+      "assignedTo": 2,
+      "categoryId": 1,
+      "dueDate": "2026-03-15",
+      "priority": "medium",
+      "version": 3,
+      "lastModifiedBy": 2,
+      "lastModifiedAt": "2026-02-21T16:31:45.892Z",
+      "createdAt": "2026-02-20T14:00:00Z"
+    },
+    {
+      "text": "New Task for Tarak",
+      "completed": false,
+      "createdBy": 1,
+      "assignedTo": 2,
+      "categoryId": 1,
+      "dueDate": null,
+      "priority": "medium",
+      "version": 3,
+      "lastModifiedBy": 2,
+      "lastModifiedAt": "2026-02-21T16:31:39.370Z",
+      "createdAt": "2026-02-21T13:45:18.358Z",
+      "id": 8
+    },
+    {
+      "text": "Finish Design Document for Residency Project",
+      "completed": true,
+      "createdBy": 1,
+      "assignedTo": 1,
+      "categoryId": 4,
+      "dueDate": null,
+      "priority": "high",
+      "version": 3,
+      "lastModifiedBy": 1,
+      "lastModifiedAt": "2026-02-21T22:57:35.812Z",
+      "createdAt": "2026-02-21T21:07:01.080Z",
+      "id": 9
+    },
+    {
+      "text": "Build Running app for ToDoList",
+      "completed": true,
+      "createdBy": 1,
+      "assignedTo": 1,
+      "categoryId": 4,
+      "dueDate": null,
+      "priority": "medium",
+      "version": 4,
+      "lastModifiedBy": 1,
+      "lastModifiedAt": "2026-02-21T22:33:03.889Z",
+      "createdAt": "2026-02-21T21:07:31.776Z",
+      "id": 10
+    },
+    {
+      "text": "Finish Presentation and Report",
+      "completed": true,
+      "createdBy": 1,
+      "assignedTo": 1,
+      "categoryId": 4,
+      "dueDate": null,
+      "priority": "medium",
+      "version": 2,
+      "lastModifiedBy": 1,
+      "lastModifiedAt": "2026-02-22T14:12:42.149Z",
+      "createdAt": "2026-02-21T21:07:51.129Z",
+      "id": 11
+    },
+    {
+      "text": "Learn Rust lang 20",
+      "completed": false,
+      "createdBy": 1,
+      "assignedTo": 1,
+      "categoryId": 1,
+      "dueDate": null,
+      "priority": "medium",
+      "version": 11,
+      "lastModifiedBy": 1,
+      "lastModifiedAt": "2026-02-22T14:09:39.556Z",
+      "createdAt": "2026-02-21T21:18:25.210Z",
+      "id": 12
+    },
+    {
+      "text": "Adding new task for tarak",
+      "completed": false,
+      "createdBy": 1,
+      "assignedTo": 2,
+      "categoryId": 1,
+      "dueDate": null,
+      "priority": "medium",
+      "version": 1,
+      "lastModifiedBy": 1,
+      "lastModifiedAt": "2026-02-22T14:10:11.797Z",
+      "createdAt": "2026-02-22T14:10:11.797Z",
+      "id": 13
+    }
+  ]
+}

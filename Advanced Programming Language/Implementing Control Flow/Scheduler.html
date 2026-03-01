@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Shift Scheduler</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --surface: #ffffff;
+            --background: #f1f5f9;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --alert: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 350px 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--surface);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+        }
+
+        h1, h2, h3 {
+            margin-top: 0;
+            color: var(--text-main);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .day-pref-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background-color: var(--surface);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background-color: #f8fafc;
+        }
+
+        .employee-badge {
+            display: inline-block;
+            background-color: #e0e7ff;
+            color: #3730a3;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 2px;
+        }
+
+        .schedule-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .day-card {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .day-header {
+            background-color: #f8fafc;
+            padding: 10px 15px;
+            font-weight: bold;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .shift-row {
+            display: flex;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .shift-row:last-child {
+            border-bottom: none;
+        }
+
+        .shift-name {
+            width: 100px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .shift-workers {
+            flex: 1;
+        }
+
+        .alert-text {
+            color: var(--alert);
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .auto-assigned {
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card">
+            <h2>1. Add Employee</h2>
+            <div class="form-group">
+                <label for="empName">Employee Name</label>
+                <input type="text" id="empName" placeholder="e.g., John Doe">
+            </div>
+            
+            <label>Weekly Shift Preferences</label>
+            <div class="day-pref-grid" id="preferencesGrid">
+                </div>
+
+            <button class="btn" onclick="addEmployeeFromForm()">Add Employee</button>
+            <button class="btn btn-secondary" onclick="loadMockData()">Load Mock Data</button>
+
+            <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
+
+            <h3>Current Staff (<span id="staffCount">0</span>)</h3>
+            <div id="employeeListDisplay" style="margin-bottom: 20px; min-height: 50px;">
+                <span class="text-muted" style="font-size: 14px;">No employees added yet.</span>
+            </div>
+
+            <button class="btn" style="background-color: #10b981;" onclick="generateSchedule()">Generate Schedule</button>
+        </div>
+
+        <div class="card">
+            <h2>2. Generated Schedule</h2>
+            <div id="scheduleOutput" class="schedule-grid">
+                <p style="color: var(--text-muted);">Add employees and click "Generate Schedule" to view results.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Core Business Logic (Adapted from previous Java/JS solutions) ---
+        const NUMBER_OF_DAYS = 7;
+        const MAX_EMPLOYEES_PER_SHIFT = 3;
+
+        const ShiftType = Object.freeze({
+            MORNING: 'MORNING',
+            AFTERNOON: 'AFTERNOON',
+            EVENING: 'EVENING'
+        });
+
+        class Employee {
+            constructor(name) {
+                this.name = name;
+                this.preferences = new Map();
+                this.daysWorked = 0;
+                this.daysWorkedSet = new Set();
+            }
+        }
+
+        // Application State
+        let employees = [];
+
+        // --- GUI Interaction Logic ---
+
+        // Initialize Preference Dropdowns
+        window.onload = () => {
+            const grid = document.getElementById('preferencesGrid');
+            for (let i = 1; i <= NUMBER_OF_DAYS; i++) {
+                grid.innerHTML += `
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="font-size: 12px;">Day ${i}</label>
+                        <select id="day${i}Pref">
+                            <option value="MORNING">Morning</option>
+                            <option value="AFTERNOON">Afternoon</option>
+                            <option value="EVENING">Evening</option>
+                        </select>
+                    </div>
+                `;
+            }
+        };
+
+        function addEmployeeFromForm() {
+            const nameInput = document.getElementById('empName');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                alert("Please enter an employee name.");
+                return;
+            }
+
+            const newEmp = new Employee(name);
+            for (let i = 1; i <= NUMBER_OF_DAYS; i++) {
+                const pref = document.getElementById(`day${i}Pref`).value;
+                newEmp.preferences.set(i, ShiftType[pref]);
+            }
+
+            employees.push(newEmp);
+            nameInput.value = '';
+            updateEmployeeListUI();
+        }
+
+        function loadMockData() {
+            employees = [
+                new Employee("Arun"), new Employee("Bob"), new Employee("Charlie"),
+                new Employee("Diana"), new Employee("Eve"), new Employee("Frank")
+            ];
+            
+            // Set some default preferences
+            employees[0].preferences.set(1, ShiftType.MORNING);
+            employees[1].preferences.set(1, ShiftType.MORNING);
+            employees[2].preferences.set(1, ShiftType.AFTERNOON);
+            employees[3].preferences.set(1, ShiftType.AFTERNOON);
+            employees[4].preferences.set(1, ShiftType.EVENING);
+            employees[5].preferences.set(1, ShiftType.EVENING);
+
+            updateEmployeeListUI();
+        }
+
+        function updateEmployeeListUI() {
+            document.getElementById('staffCount').innerText = employees.length;
+            const listDiv = document.getElementById('employeeListDisplay');
+            
+            if (employees.length === 0) {
+                listDiv.innerHTML = '<span style="color: #64748b; font-size: 14px;">No employees added yet.</span>';
+                return;
+            }
+
+            listDiv.innerHTML = employees.map(emp => 
+                `<span class="employee-badge">${emp.name}</span>`
+            ).join('');
+        }
+
+        // --- Scheduling Algorithm ---
+
+        function generateSchedule() {
+            if (employees.length === 0) {
+                alert("Please add at least one employee before generating a schedule.");
+                return;
+            }
+
+            // Reset employee tracking states before generating a new schedule
+            employees.forEach(emp => {
+                emp.daysWorked = 0;
+                emp.daysWorkedSet.clear();
+            });
+
+            const schedule = createEmptyWeeklySchedule();
+            assignEmployeesBasedOnPreferences(schedule, employees, MAX_EMPLOYEES_PER_SHIFT);
+            enforceMinimumShiftCoverage(schedule, employees);
+            renderScheduleUI(schedule);
+        }
+
+        function createEmptyWeeklySchedule() {
+            const schedule = new Map();
+            for (let i = 1; i <= NUMBER_OF_DAYS; i++) {
+                const dailySchedule = new Map();
+                for (const shift of Object.values(ShiftType)) {
+                    dailySchedule.set(shift, []);
+                }
+                schedule.set(i, dailySchedule);
+            }
+            return schedule;
+        }
+
+        function assignEmployeesBasedOnPreferences(schedule, employees, maxPerShift) {
+            for (let day = 1; day <= NUMBER_OF_DAYS; day++) {
+                for (const emp of employees) {
+                    if (emp.daysWorked >= 5 || emp.daysWorkedSet.has(day)) continue;
+
+                    const pref = emp.preferences.has(day) ? emp.preferences.get(day) : ShiftType.MORNING;
+
+                    if (schedule.get(day).get(pref).length < maxPerShift) {
+                        assignWorkerToShift(schedule, emp, day, pref);
+                    } else {
+                        // Conflict Resolution
+                        for (const altShift of Object.values(ShiftType)) {
+                            if (schedule.get(day).get(altShift).length < maxPerShift) {
+                                assignWorkerToShift(schedule, emp, day, altShift);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        function enforceMinimumShiftCoverage(schedule, employees) {
+            for (let day = 1; day <= NUMBER_OF_DAYS; day++) {
+                for (const shift of Object.values(ShiftType)) {
+                    const workers = schedule.get(day).get(shift);
+
+                    while (workers.length < 2) {
+                        let workerAssigned = false;
+                        for (const emp of employees) {
+                            if (emp.daysWorked < 5 && !emp.daysWorkedSet.has(day)) {
+                                workers.push(`<span class="employee-badge">${emp.name} <span class="auto-assigned">(Auto)</span></span>`);
+                                emp.daysWorked++;
+                                emp.daysWorkedSet.add(day);
+                                workerAssigned = true;
+                                break;
+                            }
+                        }
+
+                        if (!workerAssigned) {
+                            workers.push(`<span class="alert-text">[Alert: Short Staffed]</span>`);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        function assignWorkerToShift(schedule, emp, day, shift) {
+            schedule.get(day).get(shift).push(`<span class="employee-badge">${emp.name}</span>`);
+            emp.daysWorked++;
+            emp.daysWorkedSet.add(day);
+        }
+
+        function renderScheduleUI(schedule) {
+            const outputDiv = document.getElementById('scheduleOutput');
+            outputDiv.innerHTML = ''; // Clear previous
+
+            for (let day = 1; day <= NUMBER_OF_DAYS; day++) {
+                let dayCardHTML = `
+                    <div class="day-card">
+                        <div class="day-header">Day ${day}</div>
+                `;
+
+                for (const shift of Object.values(ShiftType)) {
+                    const assignedWorkers = schedule.get(day).get(shift);
+                    const formattedShiftName = shift.charAt(0) + shift.slice(1).toLowerCase();
+                    const workerHTML = assignedWorkers.length === 0 ? '<span style="color:#94a3b8;font-size:14px;">None</span>' : assignedWorkers.join(' ');
+
+                    dayCardHTML += `
+                        <div class="shift-row">
+                            <div class="shift-name">${formattedShiftName}</div>
+                            <div class="shift-workers">${workerHTML}</div>
+                        </div>
+                    `;
+                }
+
+                dayCardHTML += `</div>`;
+                outputDiv.innerHTML += dayCardHTML;
+            }
+        }
+    </script>
+</body>
+</html>
